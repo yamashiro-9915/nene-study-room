@@ -1,525 +1,873 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>ときねねstudy room</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --pink: #E879B8;
-    --pink-light: #F9A8D4;
-    --pink-pale: #FDF2F8;
-    --purple: #A855F7;
-    --purple-light: #C4B5FD;
-    --purple-pale: #F5F3FF;
-    --bg: #FFF8FD;
-    --white: #FFFFFF;
-    --text: #2D1B38;
-    --text-muted: #8B6FA0;
-    --card: rgba(255,255,255,0.85);
-    --radius: 20px;
-    --radius-sm: 12px;
-    --shadow: 0 4px 24px rgba(168,85,247,0.08);
-    --shadow-card: 0 2px 16px rgba(168,85,247,0.10);
-    --nav-height: 90px;
-    --glass-bg: rgba(255,255,255,0.55);
-    --glass-border: rgba(255,255,255,0.7);
-    --glass-blur: blur(24px) saturate(180%);
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ときねね study room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --pink:      #FFB7C8;
+      --pink-soft: #FFE0EA;
+      --pink-deep: #F48FA8;
+      --lavender:  #C9B8F0;
+      --lav-soft:  #EDE8FF;
+      --lav-deep:  #9B7EDE;
+      --mint:      #A8E6CF;
+      --mint-soft: #D4F5E7;
+      --cream:     #FFF7F2;
+      --white:     #FFFFFF;
+      --text:      #3D2B4A;
+      --text-soft: #7B6589;
+      --glass-bg:  rgba(255,255,255,0.55);
+      --glass-border: rgba(255,255,255,0.8);
+      --shadow:    0 8px 32px rgba(180,130,200,0.18);
+      --nav-h:     80px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      background: linear-gradient(135deg, #FFF0F7 0%, #EDE8FF 35%, #E0F5FF 70%, #F0FFF5 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: var(--text);
+      overflow-x: hidden;
+      padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+    }
 
-  body {
-    font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+    /* ─── Loading Screen ─── */
+    #loader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: linear-gradient(135deg, #FFE9F3 0%, #EDE8FF 50%, #E0EEFF 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; }
+    #loader .loader-title {
+      margin-top: 28px;
+      font-size: 1.3rem; font-weight: 700;
+      color: var(--lav-deep);
+      letter-spacing: 0.05em;
+      opacity: 0; animation: fadeUp 0.5s ease 1.8s forwards;
+    }
+    #loader .loader-sub {
+      font-size: 0.78rem; color: var(--text-soft); margin-top: 6px;
+      opacity: 0; animation: fadeUp 0.5s ease 2.0s forwards;
+    }
 
-  /* ============ SPLASH ============ */
-  #splash {
-    position: fixed; inset: 0;
-    background: linear-gradient(145deg, #FDF2F8 0%, #F5F3FF 50%, #FDF2F8 100%);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 9999;
-    transition: opacity 0.6s ease, visibility 0.6s ease;
-  }
-  #splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    /* Heart SVG Draw */
+    #heart-svg {
+      width: 120px; height: 110px;
+      filter: drop-shadow(0 4px 18px rgba(244,143,168,0.45));
+    }
+    #heart-path {
+      fill: none;
+      stroke: url(#heartGrad);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 370;
+      stroke-dashoffset: 370;
+      animation: drawHeart 1.4s cubic-bezier(0.4,0,0.2,1) 0.2s forwards;
+    }
+    #heart-fill {
+      fill: url(#heartFillGrad);
+      opacity: 0;
+      animation: fillHeart 0.5s ease 1.55s forwards;
+    }
+    @keyframes drawHeart {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes fillHeart {
+      to { opacity: 1; }
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(8px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
 
-  .splash-heart-wrap {
-    display: flex; flex-direction: column; align-items: center; gap: 20px;
-  }
-  #heartSvg {
-    width: 120px; height: 110px;
-    filter: drop-shadow(0 0 18px rgba(232,121,184,0.45));
-  }
-  #heartPath {
-    fill: none;
-    stroke: url(#heartGrad);
-    stroke-width: 4;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-dasharray: 340;
-    stroke-dashoffset: 340;
-    animation: drawHeart 1.6s cubic-bezier(0.4,0,0.2,1) 0.3s forwards;
-  }
-  #heartFill {
-    fill: url(#heartGrad);
-    opacity: 0;
-    animation: fillHeart 0.4s ease 1.8s forwards;
-  }
-  @keyframes drawHeart {
-    to { stroke-dashoffset: 0; }
-  }
-  @keyframes fillHeart {
-    to { opacity: 1; }
-  }
-  .splash-title {
-    font-size: 1.3rem; font-weight: 700;
-    background: linear-gradient(135deg, var(--pink), var(--purple));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    opacity: 0; animation: fadeUp 0.5s ease 2.1s forwards;
-    letter-spacing: 0.05em;
-  }
-  @keyframes fadeUp {
-    from { opacity:0; transform:translateY(8px); }
-    to { opacity:1; transform:translateY(0); }
-  }
+    /* ─── Floating blobs (background decor) ─── */
+    .blob {
+      position: fixed; border-radius: 50%; filter: blur(60px);
+      opacity: 0.35; pointer-events: none; z-index: 0;
+    }
+    .blob-1 { width:260px; height:260px; background:#FFB7C8; top:-60px; left:-60px; }
+    .blob-2 { width:200px; height:200px; background:#C9B8F0; bottom:120px; right:-50px; }
+    .blob-3 { width:180px; height:180px; background:#A8E6CF; top:40%; left:60%; }
 
-  /* ============ MAIN APP ============ */
-  #app { display: none; }
-  #app.visible { display: block; }
+    /* ─── Content wrapper ─── */
+    #content { position: relative; z-index: 1; }
 
-  /* ============ HEADER ============ */
-  .site-header {
-    position: sticky; top: 0; z-index: 100;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-bottom: 1px solid var(--glass-border);
-    padding: 14px 20px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .header-logo {
-    font-size: 1.05rem; font-weight: 700;
-    background: linear-gradient(135deg, var(--pink), var(--purple));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    letter-spacing: 0.02em;
-  }
-  .header-sub {
-    font-size: 0.65rem; color: var(--text-muted); font-weight: 400;
-    display: block; letter-spacing: 0.03em;
-  }
-  .header-heart {
-    width: 32px; height: 28px;
-    filter: drop-shadow(0 2px 6px rgba(232,121,184,0.4));
-  }
+    /* ─── Page Header ─── */
+    .site-header {
+      text-align: center;
+      padding: 36px 20px 12px;
+    }
+    .site-header .emoji-icon { font-size: 2rem; }
+    .site-header h1 {
+      font-size: 1.55rem; font-weight: 800;
+      background: linear-gradient(120deg, var(--pink-deep), var(--lav-deep), #5BC4BF);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.04em; margin-top: 4px;
+    }
+    .site-header p {
+      font-size: 0.76rem; color: var(--text-soft);
+      margin-top: 2px; letter-spacing: 0.06em;
+    }
 
-  /* ============ PAGES ============ */
-  .page { display: none; padding: 20px 16px calc(var(--nav-height) + 24px); min-height: 100vh; }
-  .page.active { display: block; animation: pageIn 0.3s ease; }
-  @keyframes pageIn {
-    from { opacity:0; transform:translateY(6px); }
-    to { opacity:1; transform:translateY(0); }
-  }
+    /* ─── Section (page) ─── */
+    .page { display: none; padding: 0 0 20px; }
+    .page.active { display: block; }
 
-  /* ============ HOME PAGE ============ */
-  .welcome-card {
-    background: linear-gradient(135deg, #FBCFE8, #DDD6FE);
-    border-radius: var(--radius);
-    padding: 22px 20px;
-    margin-bottom: 20px;
-    position: relative; overflow: hidden;
-  }
-  .welcome-card::before {
-    content: '✨';
-    position: absolute; right: 18px; top: 14px;
-    font-size: 2rem; opacity: 0.4;
-  }
-  .welcome-card h2 {
-    font-size: 1.15rem; font-weight: 700; color: #4B1D82;
-    margin-bottom: 4px;
-  }
-  .welcome-card p { font-size: 0.8rem; color: #6B21A8; font-weight: 400; line-height: 1.6; }
+    /* ─── Section title ─── */
+    .section-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.95rem; font-weight: 700;
+      color: var(--text); margin: 20px 16px 10px;
+    }
+    .section-title::before {
+      content: ''; display: block;
+      width: 4px; height: 18px; border-radius: 2px;
+      background: linear-gradient(to bottom, var(--pink-deep), var(--lav-deep));
+    }
 
-  .section-title {
-    font-size: 0.75rem; font-weight: 700;
-    color: var(--text-muted);
-    letter-spacing: 0.08em; text-transform: uppercase;
-    margin-bottom: 12px; padding-left: 4px;
-  }
+    /* ─── Glass Card ─── */
+    .card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px) saturate(1.6);
+      -webkit-backdrop-filter: blur(16px) saturate(1.6);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      margin: 0 16px 14px;
+      padding: 18px;
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+    }
 
-  /* Link cards grid */
-  .link-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-  .link-card {
-    background: var(--card);
-    border: 1px solid rgba(168,85,247,0.12);
-    border-radius: var(--radius);
-    padding: 18px 14px;
-    text-decoration: none; color: inherit;
-    display: flex; flex-direction: column; gap: 8px;
-    box-shadow: var(--shadow-card);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-    cursor: pointer;
-  }
-  .link-card:active { transform: scale(0.97); box-shadow: 0 1px 8px rgba(168,85,247,0.08); }
-  .link-card-icon { font-size: 1.8rem; }
-  .link-card-title { font-size: 0.85rem; font-weight: 700; color: var(--text); }
-  .link-card-sub { font-size: 0.7rem; color: var(--text-muted); line-height: 1.4; }
+    /* ─── Link Button ─── */
+    .link-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 16px;
+      margin: 0 16px 12px;
+      box-shadow: 0 4px 16px rgba(180,130,200,0.12);
+      text-decoration: none; color: var(--text);
+      transition: transform 0.18s, box-shadow 0.18s;
+      cursor: pointer;
+    }
+    .link-item:active { transform: scale(0.97); box-shadow: 0 2px 8px rgba(180,130,200,0.1); }
+    .link-item .link-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .link-item .link-text { flex: 1; }
+    .link-item .link-text strong { display: block; font-size: 0.88rem; font-weight: 700; }
+    .link-item .link-text span { font-size: 0.72rem; color: var(--text-soft); }
+    .link-item .link-arrow { color: var(--text-soft); font-size: 0.9rem; }
 
-  .link-card.pink-accent { border-color: rgba(232,121,184,0.25); }
-  .link-card.purple-accent { border-color: rgba(168,85,247,0.25); }
+    /* ─── Password copy ─── */
+    .pw-box {
+      background: rgba(255,255,255,0.7);
+      border: 1.5px dashed var(--lavender);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-top: 10px;
+    }
+    .pw-box p { font-size: 0.7rem; color: var(--text-soft); margin-bottom: 6px; }
+    .pw-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .pw-row:last-child { margin-bottom: 0; }
+    .pw-label { font-size: 0.72rem; color: var(--text-soft); }
+    .pw-val {
+      font-size: 0.82rem; font-weight: 700;
+      color: var(--lav-deep); font-family: monospace;
+      letter-spacing: 0.06em;
+    }
+    .copy-btn {
+      background: linear-gradient(135deg, var(--lavender), var(--lav-deep));
+      color: white; border: none; border-radius: 8px;
+      padding: 4px 10px; font-size: 0.68rem; font-weight: 700;
+      cursor: pointer; font-family: 'M PLUS Rounded 1c', sans-serif;
+      transition: opacity 0.15s;
+    }
+    .copy-btn:active { opacity: 0.7; }
 
-  /* Password card */
-  .pw-card {
-    background: var(--card);
-    border: 1px solid rgba(168,85,247,0.12);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    margin-top: -4px; margin-bottom: 24px;
-    box-shadow: var(--shadow-card);
-  }
-  .pw-card-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; }
-  .pw-row {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
-  }
-  .pw-label { font-size: 0.68rem; color: var(--text-muted); width: 68px; flex-shrink: 0; }
-  .pw-value {
-    font-size: 0.78rem; font-weight: 700; color: var(--text);
-    background: linear-gradient(135deg, var(--pink-pale), var(--purple-pale));
-    border-radius: 8px; padding: 5px 10px;
-    flex: 1; letter-spacing: 0.04em;
-  }
-  .pw-copy-btn {
-    background: linear-gradient(135deg, var(--pink), var(--purple));
-    color: #fff; border: none; border-radius: 8px;
-    padding: 5px 11px; font-size: 0.65rem; font-weight: 700;
-    font-family: inherit; cursor: pointer;
-    transition: opacity 0.15s; white-space: nowrap;
-  }
-  .pw-copy-btn:active { opacity: 0.75; }
+    /* ─── AI Contents ─── */
 
-  /* Quick access */
-  .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
-  .quick-btn {
-    background: var(--card);
-    border: 1px solid rgba(168,85,247,0.1);
-    border-radius: var(--radius-sm);
-    padding: 14px 8px;
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-    cursor: pointer; text-decoration: none; color: inherit;
-    box-shadow: var(--shadow-card);
-    transition: transform 0.15s;
-  }
-  .quick-btn:active { transform: scale(0.96); }
-  .quick-btn-icon { font-size: 1.5rem; }
-  .quick-btn-label { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-align: center; }
+    /* Pomodoro Timer */
+    .pomodoro-wrap { text-align: center; }
+    .pomo-ring {
+      width: 120px; height: 120px; margin: 0 auto 14px;
+      position: relative;
+    }
+    .pomo-ring svg { transform: rotate(-90deg); }
+    .pomo-ring .ring-bg { fill: none; stroke: #F0E8FF; stroke-width: 8; }
+    .pomo-ring .ring-prog {
+      fill: none;
+      stroke: url(#pomoGrad);
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s linear;
+    }
+    .pomo-time {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .pomo-time .time-num {
+      font-size: 1.5rem; font-weight: 800;
+      color: var(--lav-deep); line-height: 1;
+    }
+    .pomo-time .time-label {
+      font-size: 0.6rem; color: var(--text-soft); margin-top: 2px;
+    }
+    .pomo-mode-label {
+      font-size: 0.75rem; font-weight: 600;
+      color: var(--pink-deep); margin-bottom: 10px;
+    }
+    .pomo-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .pomo-btn {
+      padding: 8px 18px; border-radius: 30px; border: none;
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      font-size: 0.78rem; font-weight: 700; cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .pomo-btn:active { transform: scale(0.95); }
+    .pomo-btn.start  { background: linear-gradient(135deg,#FFB7C8,#F48FA8); color:#fff; }
+    .pomo-btn.pause  { background: linear-gradient(135deg,#C9B8F0,#9B7EDE); color:#fff; }
+    .pomo-btn.reset  { background: rgba(200,200,220,0.4); color: var(--text-soft); border: 1px solid rgba(200,200,220,0.6); }
+    .pomo-btn.brk    { background: linear-gradient(135deg,#A8E6CF,#5BC4BF); color:#fff; }
+    .pomo-count { font-size: 0.7rem; color: var(--text-soft); margin-top: 8px; }
 
-  /* ============ CALENDAR PAGE ============ */
-  .cal-wrap {
-    background: var(--card);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow-card);
-    border: 1px solid rgba(168,85,247,0.1);
-  }
-  .cal-wrap iframe {
-    width: 100%; height: calc(100svh - 180px); min-height: 400px;
-    border: none; display: block;
-  }
+    /* Daily Quote */
+    .quote-box { text-align: center; }
+    .quote-icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .quote-text {
+      font-size: 0.9rem; font-weight: 500; line-height: 1.7;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .quote-author { font-size: 0.7rem; color: var(--text-soft); }
+    .quote-refresh {
+      margin-top: 10px;
+      background: linear-gradient(135deg, var(--mint), #5BC4BF);
+      color: white; border: none; border-radius: 20px;
+      padding: 6px 16px; font-size: 0.72rem; font-weight: 700;
+      cursor: pointer; font-family: 'M PLUS Rounded 1c', sans-serif;
+    }
 
-  /* ============ TEXTBOOK PAGE ============ */
-  .textbook-hero {
-    background: linear-gradient(135deg, #DDD6FE, #FBCFE8);
-    border-radius: var(--radius);
-    padding: 22px 20px; margin-bottom: 20px;
-    text-align: center;
-  }
-  .textbook-hero .icon { font-size: 2.5rem; margin-bottom: 8px; }
-  .textbook-hero h2 { font-size: 1.05rem; font-weight: 700; color: #4B1D82; margin-bottom: 4px; }
-  .textbook-hero p { font-size: 0.75rem; color: #6B21A8; line-height: 1.6; }
+    /* Study Notes */
+    .notes-area {
+      width: 100%; min-height: 100px;
+      background: rgba(255,255,255,0.6);
+      border: 1.5px solid rgba(200,180,240,0.4);
+      border-radius: 12px;
+      padding: 12px; font-family: 'M PLUS Rounded 1c', sans-serif;
+      font-size: 0.82rem; color: var(--text); resize: vertical;
+      outline: none; line-height: 1.6;
+    }
+    .notes-area:focus { border-color: var(--lavender); }
+    .notes-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 8px;
+    }
+    .notes-saved { font-size: 0.68rem; color: var(--mint-soft); }
+    .notes-save {
+      background: linear-gradient(135deg, var(--lavender), var(--lav-deep));
+      color: white; border: none; border-radius: 10px;
+      padding: 6px 14px; font-size: 0.72rem; font-weight: 700;
+      cursor: pointer; font-family: 'M PLUS Rounded 1c', sans-serif;
+    }
 
-  .open-drive-btn {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    background: linear-gradient(135deg, var(--pink), var(--purple));
-    color: #fff; text-decoration: none;
-    border-radius: var(--radius);
-    padding: 16px 24px;
-    font-size: 0.9rem; font-weight: 700;
-    box-shadow: 0 4px 20px rgba(168,85,247,0.3);
-    transition: transform 0.15s, box-shadow 0.15s;
-  }
-  .open-drive-btn:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(168,85,247,0.2); }
+    /* Progress tracker */
+    .progress-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+    }
+    .progress-header h3 { font-size: 0.88rem; font-weight: 700; }
+    .progress-header span { font-size: 0.7rem; color: var(--text-soft); }
+    .progress-item { margin-bottom: 12px; }
+    .progress-item-header {
+      display: flex; justify-content: space-between;
+      font-size: 0.75rem; margin-bottom: 5px;
+    }
+    .progress-bar-bg {
+      height: 8px; background: rgba(200,180,240,0.25);
+      border-radius: 4px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+    .progress-bar-fill.pink  { background: linear-gradient(90deg, var(--pink), var(--pink-deep)); }
+    .progress-bar-fill.lav   { background: linear-gradient(90deg, var(--lavender), var(--lav-deep)); }
+    .progress-bar-fill.mint  { background: linear-gradient(90deg, var(--mint), #5BC4BF); }
+    .progress-input {
+      display: flex; gap: 6px; margin-top: 4px;
+    }
+    .progress-input input {
+      flex: 1; padding: 5px 8px;
+      border: 1.5px solid rgba(200,180,240,0.4);
+      border-radius: 8px; font-size: 0.72rem;
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      background: rgba(255,255,255,0.5); color: var(--text); outline: none;
+    }
+    .progress-input button {
+      padding: 5px 10px; border-radius: 8px; border: none;
+      background: var(--lav-deep); color: white;
+      font-size: 0.7rem; font-weight: 700; cursor: pointer;
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+    }
 
-  /* ============ TIMETABLE PAGE ============ */
-  .tt-wrap {
-    background: var(--card);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow-card);
-    border: 1px solid rgba(168,85,247,0.1);
-  }
-  .tt-wrap iframe {
-    width: 100%; height: calc(100svh - 180px); min-height: 420px;
-    border: none; display: block;
-  }
-  .tt-hint {
-    font-size: 0.7rem; color: var(--text-muted); text-align: center;
-    padding: 10px 0 0;
-  }
+    /* ─── Calendar page ─── */
+    .calendar-wrap {
+      margin: 0 16px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+    .calendar-wrap iframe {
+      width: 100%;
+      height: calc(100vh - 200px);
+      min-height: 400px;
+      border: none; display: block;
+    }
 
-  /* ============ BOTTOM NAV (iOS 26 glass) ============ */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    z-index: 200;
-    padding: 0 12px env(safe-area-inset-bottom, 10px);
-    pointer-events: none;
-  }
-  .bottom-nav-inner {
-    background: rgba(255,255,255,0.62);
-    backdrop-filter: blur(32px) saturate(200%);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
-    border: 1px solid rgba(255,255,255,0.78);
-    border-radius: 28px;
-    margin-bottom: 12px;
-    padding: 10px 8px;
-    display: flex; justify-content: space-around; align-items: center;
-    box-shadow:
-      0 8px 32px rgba(168,85,247,0.13),
-      0 1px 0 rgba(255,255,255,0.9) inset,
-      0 -1px 0 rgba(168,85,247,0.06) inset;
-    pointer-events: all;
-  }
-  .nav-item {
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
-    padding: 6px 16px; border-radius: 18px;
-    cursor: pointer; border: none; background: transparent;
-    font-family: inherit; transition: background 0.18s;
-    position: relative; min-width: 64px;
-  }
-  .nav-item:active { background: rgba(168,85,247,0.08); }
-  .nav-item.active {
-    background: linear-gradient(135deg, rgba(232,121,184,0.18), rgba(168,85,247,0.18));
-  }
-  .nav-icon {
-    font-size: 1.4rem; line-height: 1;
-    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .nav-item.active .nav-icon { transform: scale(1.15); }
-  .nav-label {
-    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.02em;
-    color: var(--text-muted);
-    transition: color 0.18s;
-  }
-  .nav-item.active .nav-label {
-    background: linear-gradient(135deg, var(--pink), var(--purple));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .nav-dot {
-    width: 4px; height: 4px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--pink), var(--purple));
-    position: absolute; bottom: 2px;
-    opacity: 0; transition: opacity 0.2s;
-  }
-  .nav-item.active .nav-dot { opacity: 1; }
-</style>
+    /* ─── Textbook page ─── */
+    .textbook-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: calc(100% - 32px); margin: 0 auto 14px;
+      padding: 18px; border-radius: 20px; border: none;
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      font-size: 0.92rem; font-weight: 700; cursor: pointer;
+      text-decoration: none; color: white;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .textbook-btn:active { transform: scale(0.97); }
+    .textbook-btn.drive {
+      background: linear-gradient(135deg, #4ECDC4, #44A08D);
+      box-shadow: 0 6px 20px rgba(78,205,196,0.3);
+    }
+
+    /* ─── Timetable page ─── */
+    .timetable-wrap {
+      margin: 0 16px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .timetable-wrap iframe {
+      width: 100%; height: calc(100vh - 200px);
+      min-height: 400px; border: none; display: block;
+    }
+
+    /* ─── Bottom Nav (iOS 26 Glass) ─── */
+    #bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 0 16px;
+      padding-bottom: calc(var(--safe-bottom) + 12px);
+    }
+    .nav-inner {
+      background: rgba(255, 255, 255, 0.62);
+      backdrop-filter: blur(40px) saturate(2.2) brightness(1.08);
+      -webkit-backdrop-filter: blur(40px) saturate(2.2) brightness(1.08);
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      border-radius: 28px;
+      box-shadow:
+        0 8px 40px rgba(180, 130, 200, 0.22),
+        0 1px 0 rgba(255,255,255,0.9) inset,
+        0 -1px 0 rgba(180,150,220,0.15) inset;
+      display: flex;
+      padding: 6px 4px;
+    }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 8px 4px; gap: 3px;
+      cursor: pointer; border: none; background: none;
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      border-radius: 22px;
+      transition: background 0.2s;
+      position: relative;
+    }
+    .nav-item:active { background: rgba(200,180,240,0.2); }
+    .nav-icon-wrap {
+      width: 34px; height: 34px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .nav-item.active .nav-icon-wrap {
+      background: linear-gradient(135deg, var(--pink-soft), var(--lav-soft));
+      transform: scale(1.08);
+      box-shadow: 0 2px 8px rgba(180,130,200,0.2);
+    }
+    .nav-icon { font-size: 1.25rem; line-height: 1; }
+    .nav-label {
+      font-size: 0.6rem; font-weight: 600;
+      color: var(--text-soft);
+      transition: color 0.2s;
+    }
+    .nav-item.active .nav-label {
+      color: var(--lav-deep); font-weight: 700;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: calc(var(--nav-h) + var(--safe-bottom) + 20px);
+      left: 50%; transform: translateX(-50%) translateY(20px);
+      background: rgba(60,40,80,0.85);
+      color: white; padding: 8px 18px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 500; white-space: nowrap;
+      opacity: 0; transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none; z-index: 2000;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(180,130,200,0.3); border-radius: 2px; }
+  </style>
 </head>
 <body>
 
-<!-- ===== SPLASH ===== -->
-<div id="splash">
-  <div class="splash-heart-wrap">
-    <svg id="heartSvg" viewBox="0 0 120 110" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#E879B8"/>
-          <stop offset="100%" stop-color="#A855F7"/>
-        </linearGradient>
-      </defs>
-      <!-- fill layer -->
-      <path id="heartFill" d="M60,95 C60,95 10,60 10,32 C10,16 22,6 36,6 C46,6 56,12 60,20 C64,12 74,6 84,6 C98,6 110,16 110,32 C110,60 60,95 60,95 Z"/>
-      <!-- stroke layer -->
-      <path id="heartPath" d="M60,95 C60,95 10,60 10,32 C10,16 22,6 36,6 C46,6 56,12 60,20 C64,12 74,6 84,6 C98,6 110,16 110,32 C110,60 60,95 60,95 Z"/>
-    </svg>
-    <div class="splash-title">ときねねstudy room</div>
-  </div>
+<!-- ─── Blobs ─── -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- ─── Loading Screen ─── -->
+<div id="loader">
+  <svg id="heart-svg" viewBox="0 0 120 110" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#F48FA8"/>
+        <stop offset="100%" stop-color="#C9B8F0"/>
+      </linearGradient>
+      <linearGradient id="heartFillGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFB7C8" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="#C9B8F0" stop-opacity="0.5"/>
+      </linearGradient>
+    </defs>
+    <!-- Fill (fades in after draw) -->
+    <path id="heart-fill" d="M60 95 C60 95 10 65 10 35 C10 17 22 8 35 8 C45 8 55 15 60 22 C65 15 75 8 85 8 C98 8 110 17 110 35 C110 65 60 95 60 95Z"/>
+    <!-- Stroke draw -->
+    <path id="heart-path" d="M60 95 C60 95 10 65 10 35 C10 17 22 8 35 8 C45 8 55 15 60 22 C65 15 75 8 85 8 C98 8 110 17 110 35 C110 65 60 95 60 95Z"/>
+  </svg>
+  <p class="loader-title">✦ ときねね study room ✦</p>
+  <p class="loader-sub">がんばろう！</p>
 </div>
 
-<!-- ===== MAIN APP ===== -->
-<div id="app">
+<!-- ─── Toast ─── -->
+<div id="toast"></div>
 
-  <!-- Header -->
+<!-- ─── Main Content ─── -->
+<div id="content">
+
+  <!-- Site Header -->
   <header class="site-header">
-    <div>
-      <span class="header-logo">ときねねstudy room</span>
-      <span class="header-sub">いっしょにがんばろ 📚</span>
-    </div>
-    <svg class="header-heart" viewBox="0 0 32 28" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="hg2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#E879B8"/><stop offset="100%" stop-color="#A855F7"/>
-        </linearGradient>
-      </defs>
-      <path fill="url(#hg2)" d="M16,25 C16,25 2,15 2,8 C2,4 5,1 9,1 C12,1 15,3 16,5 C17,3 20,1 23,1 C27,1 30,4 30,8 C30,15 16,25 16,25 Z"/>
-    </svg>
+    <div class="emoji-icon">📚✨</div>
+    <h1>ときねね study room</h1>
+    <p>one step at a time — がんばろう！</p>
   </header>
 
-  <!-- ===== HOME PAGE ===== -->
-  <div class="page active" id="page-home">
-    <div class="welcome-card">
-      <h2>こんにちは！ときねね👋</h2>
-      <p>勉強がんばってるね！今日も一緒に頑張ろう！</p>
-    </div>
+  <!-- ═══ HOME PAGE ═══ -->
+  <section id="page-home" class="page active">
 
-    <p class="section-title">📎 回答・教材リンク</p>
-    <div class="link-grid">
-      <a class="link-card pink-accent" href="https://www.hamajima.co.jp/eigo/eworkf-mk-k3/#p:0,s:0" target="_blank" rel="noopener">
-        <span class="link-card-icon">🇬🇧</span>
-        <span class="link-card-title">メキメキEnglish</span>
-        <span class="link-card-sub">英語ワーク回答</span>
-      </a>
-      <a class="link-card purple-accent" href="https://sing-book.sing.jp/viewer/2997fe33c2c641a498d4817731710a90?index=%2Fviewer%2F2997fe33c2c641a498d4817731710a90&print=0&outline=0&page=1" target="_blank" rel="noopener">
-        <span class="link-card-icon">📖</span>
-        <span class="link-card-title">国語ワーク</span>
-        <span class="link-card-sub">国語ワーク回答</span>
-      </a>
-    </div>
+    <!-- Quick Links -->
+    <div class="section-title">🔗 クイックリンク</div>
 
-    <!-- Password card -->
-    <div class="pw-card">
-      <div class="pw-card-title">🔑 メキメキEnglish ログイン情報</div>
-      <div class="pw-row">
-        <span class="pw-label">ユーザーID</span>
-        <span class="pw-value" id="uid">meki-k3f</span>
-        <button class="pw-copy-btn" onclick="copyText('meki-k3f', this)">コピー</button>
+    <!-- メキメキEnglish -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#FFB7C8,#C9B8F0);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">🇬🇧</div>
+        <div>
+          <strong style="font-size:0.88rem;display:block;">メキメキ English 回答</strong>
+          <span style="font-size:0.7rem;color:var(--text-soft);">パスワード入力が必要です</span>
+        </div>
+        <a href="https://www.hamajima.co.jp/eigo/eworkf-mk-k3/#p:0,s:0" target="_blank" rel="noopener"
+           style="margin-left:auto;background:linear-gradient(135deg,var(--pink),var(--pink-deep));color:white;border:none;border-radius:10px;padding:8px 14px;font-size:0.75rem;font-weight:700;cursor:pointer;text-decoration:none;font-family:'M PLUS Rounded 1c',sans-serif;white-space:nowrap;">
+          開く ↗
+        </a>
       </div>
-      <div class="pw-row">
-        <span class="pw-label">パスワード</span>
-        <span class="pw-value" id="pw">zUfYjj64</span>
-        <button class="pw-copy-btn" onclick="copyText('zUfYjj64', this)">コピー</button>
+      <div class="pw-box">
+        <p>🔑 ログイン情報（タップでコピー）</p>
+        <div class="pw-row">
+          <span class="pw-label">ユーザーID</span>
+          <span class="pw-val">meki-k3f</span>
+          <button class="copy-btn" onclick="copyText('meki-k3f', 'IDをコピーしました')">コピー</button>
+        </div>
+        <div class="pw-row">
+          <span class="pw-label">パスワード</span>
+          <span class="pw-val">zUfYjj64</span>
+          <button class="copy-btn" onclick="copyText('zUfYjj64', 'パスワードをコピーしました')">コピー</button>
+        </div>
       </div>
     </div>
 
-    <p class="section-title">⚡ クイックアクセス</p>
-    <div class="quick-grid">
-      <a class="quick-btn" onclick="switchPage('calendar')">
-        <span class="quick-btn-icon">📅</span>
-        <span class="quick-btn-label">カレンダー</span>
-      </a>
-      <a class="quick-btn" href="https://drive.google.com/drive/folders/1IxYF9lpQWODKKsCpLl5Rvwbk-wF9JWBo" target="_blank" rel="noopener">
-        <span class="quick-btn-icon">📚</span>
-        <span class="quick-btn-label">教科書</span>
-      </a>
-      <a class="quick-btn" onclick="switchPage('timetable')">
-        <span class="quick-btn-icon">🗓️</span>
-        <span class="quick-btn-label">時間割</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- ===== CALENDAR PAGE ===== -->
-  <div class="page" id="page-calendar">
-    <p class="section-title" style="margin-bottom:14px;">📅 カレンダー</p>
-    <div class="cal-wrap">
-      <iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Asia%2FTokyo&showPrint=0&src=cjYxMzM0QGpocy51LXJ5dWt5dS5hYy5qcA&src=Y182YzMzOGUzNzgwODEyYTY1ZmFlZTM0YmZmNjM4NzU0NDZjZTgzMTkxNjkyMjJhY2ExZDExNzcwNmIyN2NhOWMyQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20&src=Y19jbGFzc3Jvb20wNmMxZTQ4NkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20wZDFlOWI3MEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20wZTQxY2YyMkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20wZmQ0MjdjNkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20xMGVlZTYxZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20xNWZhMDQ1ZEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20xNzNmYmI3OEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20xZWFiNTk4ZUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20yNTVkY2VmYUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20yN2Q2MTI1Y0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20yZjM5YTNiMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20zMGI0NjRlMUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb200MGQ3NzBkM0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb200NGQ0YTFhMUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb200YTA4MWNmY0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb200Y2M3YTJkZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb201NjUxMmYwYUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb201NmFjYmI4N0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb201ZWI2YWFmOUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20xZjdlOGI5N0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20yMzk4ZTcyY0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20yYTE2NGU3MUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20zZGZmOWM2NEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb204OWI4OTE1OEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb204ZDFhYzcyZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb204ZTA0NzUzNEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb204ZjNiNTJmMkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb204ZmU1MTlkZmQ1YzRAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&src=Y19jbGFzc3Jvb205YTNhYzhkOUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21hNTZmNGMzN0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21hNjhhMzViNUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21hOTcyYzNmZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21hYTQ2NTRiYkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21iYWFkNjcxMUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21iYzFjZjIwMUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21jMWI1NjY5YkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21jMWVmMTljM0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21lNzIyNTUxM0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21lZmY5NzIzMkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21mYzNkOTRiMUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=amEuamFwYW5lc2UjaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%23039be5&color=%23f4511e&color=%23202124&color=%23007b83&color=%231967d2&color=%23c26401&color=%23b80672&color=%23202124&color=%23c26401&color=%23c26401&color=%23b80672&color=%231967d2&color=%237627bb&color=%23202124&color=%23b80672&color=%23c26401&color=%231967d2&color=%23202124&color=%231967d2&color=%23c26401&color=%231967d2&color=%231967d2&color=%23137333&color=%23c26401&color=%23202124&color=%23174ea6&color=%23174ea6&color=%231967d2&color=%23137333&color=%23c26401&color=%23137333&color=%23007b83&color=%231967d2&color=%231967d2&color=%23202124&color=%23174ea6&color=%231967d2&color=%231967d2&color=%231967d2&color=%231967d2&color=%23137333&color=%231967d2&color=%230b8043" style="border:0" frameborder="0" scrolling="yes" allowfullscreen></iframe>
-    </div>
-  </div>
-
-  <!-- ===== TEXTBOOK PAGE ===== -->
-  <div class="page" id="page-textbook">
-    <p class="section-title" style="margin-bottom:14px;">📚 教科書</p>
-    <div class="textbook-hero">
-      <div class="icon">📂</div>
-      <h2>教科書フォルダ</h2>
-      <p>Google Driveに保存された教科書を確認できます。</p>
-    </div>
-    <a class="open-drive-btn" href="https://drive.google.com/drive/folders/1IxYF9lpQWODKKsCpLl5Rvwbk-wF9JWBo" target="_blank" rel="noopener">
-      📁　Google Driveで開く
+    <!-- 国語ワーク -->
+    <a class="link-item" href="https://sing-book.sing.jp/viewer/2997fe33c2c641a498d4817731710a90?index=%2Fviewer%2F2997fe33c2c641a498d4817731710a90&print=0&outline=0&page=1" target="_blank" rel="noopener">
+      <div class="link-icon" style="background:linear-gradient(135deg,#FFE4B5,#FFB347);">📖</div>
+      <div class="link-text">
+        <strong>国語のワーク 回答</strong>
+        <span>新しいタブで開きます</span>
+      </div>
+      <span class="link-arrow">↗</span>
     </a>
-    <p style="font-size:0.7rem; color:var(--text-muted); text-align:center; margin-top:12px;">
-      新しいタブで開きます
-    </p>
-  </div>
 
-  <!-- ===== TIMETABLE PAGE ===== -->
-  <div class="page" id="page-timetable">
-    <p class="section-title" style="margin-bottom:14px;">🗓️ 時間割</p>
-    <div class="tt-wrap">
-      <iframe src="https://drive.google.com/file/d/1CsahAmXmoJViIj8Q3SR3-di6b_LiCW02/preview" allow="autoplay" allowfullscreen></iframe>
+    <!-- Pomodoro Timer -->
+    <div class="section-title">⏱ ポモドーロタイマー</div>
+    <div class="card">
+      <div class="pomodoro-wrap">
+        <svg width="0" height="0" style="position:absolute;">
+          <defs>
+            <linearGradient id="pomoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#FFB7C8"/>
+              <stop offset="100%" stop-color="#C9B8F0"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <p class="pomo-mode-label" id="pomoModeLabel">🍅 集中タイム</p>
+        <div class="pomo-ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="52"/>
+            <circle class="ring-prog" id="pomoRing" cx="60" cy="60" r="52"
+              stroke-dasharray="326.7" stroke-dashoffset="0"/>
+          </svg>
+          <div class="pomo-time">
+            <div class="time-num" id="pomoDisplay">25:00</div>
+            <div class="time-label" id="pomoSubLabel">focus</div>
+          </div>
+        </div>
+        <div class="pomo-btns">
+          <button class="pomo-btn start" onclick="pomoStart()">▶ スタート</button>
+          <button class="pomo-btn pause" onclick="pomoPause()">⏸ 一時停止</button>
+          <button class="pomo-btn reset" onclick="pomoReset()">↺ リセット</button>
+          <button class="pomo-btn brk" onclick="pomoBreak()">☕ 休憩5分</button>
+        </div>
+        <p class="pomo-count" id="pomoCount">完了セット数: <strong>0</strong></p>
+      </div>
     </div>
-    <p class="tt-hint">※ 表示されない場合はGoogleアカウントにログインしてください</p>
-  </div>
 
-  <!-- ===== BOTTOM NAV ===== -->
-  <nav class="bottom-nav">
-    <div class="bottom-nav-inner">
-      <button class="nav-item active" id="nav-home" onclick="switchPage('home')">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-label">ホーム</span>
-        <span class="nav-dot"></span>
-      </button>
-      <button class="nav-item" id="nav-calendar" onclick="switchPage('calendar')">
-        <span class="nav-icon">📅</span>
-        <span class="nav-label">カレンダー</span>
-        <span class="nav-dot"></span>
-      </button>
-      <button class="nav-item" id="nav-textbook" onclick="switchPage('textbook')">
-        <span class="nav-icon">📚</span>
-        <span class="nav-label">教科書</span>
-        <span class="nav-dot"></span>
-      </button>
-      <button class="nav-item" id="nav-timetable" onclick="switchPage('timetable')">
-        <span class="nav-icon">🗓️</span>
-        <span class="nav-label">時間割</span>
-        <span class="nav-dot"></span>
-      </button>
+    <!-- Daily Quote -->
+    <div class="section-title">💌 今日の一言</div>
+    <div class="card">
+      <div class="quote-box">
+        <div class="quote-icon">✨</div>
+        <p class="quote-text" id="quoteText">"小さな一歩が、大きな未来をつくる。"</p>
+        <p class="quote-author" id="quoteAuthor">— 今日も一緒にがんばろう</p>
+        <button class="quote-refresh" onclick="nextQuote()">次の一言 →</button>
+      </div>
     </div>
-  </nav>
 
-</div><!-- /#app -->
+    <!-- Study Notes -->
+    <div class="section-title">📝 学習メモ</div>
+    <div class="card">
+      <textarea class="notes-area" id="notesArea"
+        placeholder="今日やること、気になったこと、メモなど自由に書いてね ✍️"></textarea>
+      <div class="notes-footer">
+        <span class="notes-saved" id="notesSaved" style="color:var(--text-soft);">未保存</span>
+        <button class="notes-save" onclick="saveNotes()">💾 保存</button>
+      </div>
+    </div>
+
+    <!-- Progress Tracker -->
+    <div class="section-title">📊 今週の進捗</div>
+    <div class="card">
+      <div class="progress-header">
+        <h3>教科ごとの進み具合</h3>
+        <span>%で入力してね</span>
+      </div>
+      <div class="progress-item">
+        <div class="progress-item-header">
+          <span>🇬🇧 英語</span>
+          <span id="engPct">0%</span>
+        </div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill pink" id="engBar" style="width:0%"></div></div>
+        <div class="progress-input">
+          <input type="number" min="0" max="100" placeholder="0〜100" id="engInput">
+          <button onclick="updateProgress('eng')">更新</button>
+        </div>
+      </div>
+      <div class="progress-item">
+        <div class="progress-item-header">
+          <span>📖 国語</span>
+          <span id="jpnPct">0%</span>
+        </div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill lav" id="jpnBar" style="width:0%"></div></div>
+        <div class="progress-input">
+          <input type="number" min="0" max="100" placeholder="0〜100" id="jpnInput">
+          <button onclick="updateProgress('jpn')">更新</button>
+        </div>
+      </div>
+      <div class="progress-item">
+        <div class="progress-item-header">
+          <span>🔢 数学</span>
+          <span id="mathPct">0%</span>
+        </div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill mint" id="mathBar" style="width:0%"></div></div>
+        <div class="progress-input">
+          <input type="number" min="0" max="100" placeholder="0〜100" id="mathInput">
+          <button onclick="updateProgress('math')">更新</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══ CALENDAR PAGE ═══ -->
+  <section id="page-calendar" class="page">
+    <div class="section-title">📅 カレンダー</div>
+    <div class="calendar-wrap">
+      <iframe
+        src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Asia%2FTokyo&showPrint=0&src=cjYxMzM0QGpocy51LXJ5dWt5dS5hYy5qcA&src=Y182YzMzOGUzNzgwODEyYTY1ZmFlZTM0YmZmNjM4NzU0NDZjZTgzMTkxNjkyMjJhY2ExZDExNzcwNmIyN2NhOWMyQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20&src=Y19jbGFzc3Jvb20wNmMxZTQ4NkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20wZDFlOWI3MEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20wZTQxY2YyMkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20wZmQ0MjdjNkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20xMGVlZTYxZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20xNWZhMDQ1ZEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20xNzNmYmI3OEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20xZWFiNTk4ZUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20yNTVkY2VmYUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20yN2Q2MTI1Y0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20yZjM5YTNiMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20zMGI0NjRlMUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb200MGQ3NzBkM0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb200NGQ0YTFhMUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb200YTA4MWNmY0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb200Y2M3YTJkZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb201NjUxMmYwYUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb201NmFjYmI4N0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb201ZWI2YWFmOUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb201ZjdlOGI5N0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20yMzk4ZTcyY0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20yYTE2NGU3MUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb20zZGZmOWM2NEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb204OWI4OTE1OEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb204ZDFhYzcyZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb204ZTA0NzUzNEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb204ZjNiNTJmMkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb204ZmU1MTlkZmQ1YzRAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&src=Y19jbGFzc3Jvb205YTNhYzhkOUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21hNTZmNGMzN0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21hNjhhMzViNUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21hOTcyYzNmZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21hYTQ2NTRiYkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21iYWFkNjcxMUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21iYzFjZjIwMUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21jMWI1NjY5YkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21jMWVmMTljM0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21lNzIyNTUxM0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21lZmY5NzIzMkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=Y19jbGFzc3Jvb21mYzNkOTRiMUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=amEuamFwYW5lc2UjaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%23039be5&color=%23f4511e&color=%23202124&color=%23007b83&color=%231967d2&color=%23c26401&color=%23b80672&color=%23202124&color=%23c26401&color=%23c26401&color=%23b80672&color=%231967d2&color=%237627bb&color=%23202124&color=%23b80672&color=%23c26401&color=%231967d2&color=%23202124&color=%231967d2&color=%23c26401&color=%231967d2&color=%231967d2&color=%23137333&color=%23c26401&color=%23202124&color=%23174ea6&color=%23174ea6&color=%231967d2&color=%23137333&color=%23c26401&color=%23137333&color=%23007b83&color=%231967d2&color=%231967d2&color=%23202124&color=%23174ea6&color=%231967d2&color=%231967d2&color=%231967d2&color=%231967d2&color=%23137333&color=%231967d2&color=%230b8043"
+        frameborder="0"
+        scrolling="no"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </section>
+
+  <!-- ═══ TEXTBOOK PAGE ═══ -->
+  <section id="page-textbook" class="page">
+    <div class="section-title">📚 教科書</div>
+    <div class="card" style="text-align:center;padding:28px 18px;">
+      <div style="font-size:3rem;margin-bottom:12px;">📂</div>
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:6px;">教科書フォルダ</h2>
+      <p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:18px;">Google Drive に保存された教科書を確認できます</p>
+      <a href="https://drive.google.com/drive/folders/1IxYF9lpQWODKKsCpLl5Rvwbk-wF9JWBo"
+         target="_blank" rel="noopener" class="textbook-btn drive">
+        <span style="font-size:1.3rem;">📁</span>
+        Google Drive で開く ↗
+      </a>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin:0 0 12px;font-size:0.82rem;">使い方</div>
+      <ul style="font-size:0.78rem;color:var(--text-soft);line-height:2;padding-left:16px;">
+        <li>上のボタンをタップしてフォルダを開く</li>
+        <li>見たい教科書のファイルを選択</li>
+        <li>Googleアカウントでログインが必要な場合があります</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ TIMETABLE PAGE ═══ -->
+  <section id="page-timetable" class="page">
+    <div class="section-title">🗓 時間割</div>
+    <div class="timetable-wrap">
+      <iframe
+        src="https://drive.google.com/file/d/1CsahAmXmoJViIj8Q3SR3-di6b_LiCW02/preview"
+        allow="autoplay"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </section>
+
+</div><!-- /#content -->
+
+<!-- ─── Bottom Navigation ─── -->
+<nav id="bottom-nav">
+  <div class="nav-inner">
+    <button class="nav-item active" id="nav-home" onclick="switchPage('home')">
+      <div class="nav-icon-wrap"><span class="nav-icon">🏠</span></div>
+      <span class="nav-label">ホーム</span>
+    </button>
+    <button class="nav-item" id="nav-calendar" onclick="switchPage('calendar')">
+      <div class="nav-icon-wrap"><span class="nav-icon">📅</span></div>
+      <span class="nav-label">カレンダー</span>
+    </button>
+    <button class="nav-item" id="nav-textbook" onclick="switchPage('textbook')">
+      <div class="nav-icon-wrap"><span class="nav-icon">📚</span></div>
+      <span class="nav-label">教科書</span>
+    </button>
+    <button class="nav-item" id="nav-timetable" onclick="switchPage('timetable')">
+      <div class="nav-icon-wrap"><span class="nav-icon">🗓</span></div>
+      <span class="nav-label">時間割</span>
+    </button>
+  </div>
+</nav>
 
 <script>
-  // ===== SPLASH =====
+/* ─── Page Switch ─── */
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ─── Loader ─── */
+window.addEventListener('load', () => {
   setTimeout(() => {
-    document.getElementById('splash').classList.add('hidden');
-    const app = document.getElementById('app');
-    app.classList.add('visible');
-  }, 2700);
+    document.getElementById('loader').classList.add('hidden');
+  }, 2400);
+});
 
-  // ===== PAGE SWITCH =====
-  function switchPage(name) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    const page = document.getElementById('page-' + name);
-    const nav = document.getElementById('nav-' + name);
-    if (page) page.classList.add('active');
-    if (nav) nav.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+/* ─── Toast ─── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
 
-  // ===== COPY =====
-  function copyText(text, btn) {
-    navigator.clipboard.writeText(text).then(() => {
-      const orig = btn.textContent;
-      btn.textContent = '✓';
-      btn.style.background = 'linear-gradient(135deg,#34d399,#059669)';
-      setTimeout(() => {
-        btn.textContent = orig;
-        btn.style.background = '';
-      }, 1400);
-    }).catch(() => {
+/* ─── Copy ─── */
+function copyText(text, msg) {
+  navigator.clipboard.writeText(text).then(() => showToast('✅ ' + msg))
+    .catch(() => {
+      // fallback
       const el = document.createElement('textarea');
-      el.value = text; el.style.position='fixed'; el.style.opacity='0';
-      document.body.appendChild(el); el.select();
-      document.execCommand('copy'); document.body.removeChild(el);
-      const orig = btn.textContent;
-      btn.textContent = '✓';
-      setTimeout(() => { btn.textContent = orig; }, 1400);
+      el.value = text; document.body.appendChild(el);
+      el.select(); document.execCommand('copy');
+      document.body.removeChild(el);
+      showToast('✅ ' + msg);
     });
-  }
+}
+
+/* ─── Daily Quotes ─── */
+const quotes = [
+  { text: "小さな一歩が、大きな未来をつくる。", author: "— 今日も一緒にがんばろう" },
+  { text: "才能は努力を超えられない。", author: "— Keep Going ✨" },
+  { text: "今日の自分は、昨日の自分より少し賢い。", author: "— 毎日が成長の日" },
+  { text: "諦めたらそこで試合終了だよ。", author: "— 安西先生（スラムダンク）" },
+  { text: "夢を見ることができれば、それは実現できる。", author: "— Walt Disney" },
+  { text: "どんなに遅くても、前へ進む人は立ち止まっている人より速い。", author: "— 一歩一歩" },
+  { text: "困難の中に機会がある。", author: "— Albert Einstein" },
+  { text: "始まりはいつも雨。でも雨上がりには虹が出る。", author: "— 前を向こう 🌈" },
+  { text: "勉強は、世界を広げる魔法の鍵。", author: "— ときねね study room" },
+  { text: "頑張った今日が、未来の自分を支えてくれる。", author: "— You got this! 💪" },
+];
+let qIdx = Math.floor(Math.random() * quotes.length);
+function nextQuote() {
+  qIdx = (qIdx + 1) % quotes.length;
+  document.getElementById('quoteText').textContent = '"' + quotes[qIdx].text + '"';
+  document.getElementById('quoteAuthor').textContent = quotes[qIdx].author;
+}
+document.getElementById('quoteText').textContent = '"' + quotes[qIdx].text + '"';
+document.getElementById('quoteAuthor').textContent = quotes[qIdx].author;
+
+/* ─── Study Notes ─── */
+const notesArea = document.getElementById('notesArea');
+const savedNotes = localStorage.getItem('tokinene_notes');
+if (savedNotes) notesArea.value = savedNotes;
+function saveNotes() {
+  localStorage.setItem('tokinene_notes', notesArea.value);
+  document.getElementById('notesSaved').textContent = '保存済み ✓';
+  document.getElementById('notesSaved').style.color = 'var(--mint)';
+  showToast('📝 メモを保存しました');
+}
+
+/* ─── Progress Tracker ─── */
+const progKeys = ['eng', 'jpn', 'math'];
+progKeys.forEach(k => {
+  const saved = localStorage.getItem('tokinene_prog_' + k);
+  if (saved) setBar(k, parseInt(saved));
+});
+function setBar(k, pct) {
+  pct = Math.min(100, Math.max(0, pct));
+  document.getElementById(k + 'Bar').style.width = pct + '%';
+  document.getElementById(k + 'Pct').textContent = pct + '%';
+}
+function updateProgress(k) {
+  const val = parseInt(document.getElementById(k + 'Input').value) || 0;
+  setBar(k, val);
+  localStorage.setItem('tokinene_prog_' + k, val);
+  showToast('📊 進捗を更新しました！');
+}
+
+/* ─── Pomodoro Timer ─── */
+let pomoState = { running: false, mode: 'focus', seconds: 25*60, totalSecs: 25*60, interval: null, sets: 0 };
+const CIRC = 2 * Math.PI * 52; // 326.7
+
+function pomoUpdateUI() {
+  const m = Math.floor(pomoState.seconds / 60).toString().padStart(2,'0');
+  const s = (pomoState.seconds % 60).toString().padStart(2,'0');
+  document.getElementById('pomoDisplay').textContent = m + ':' + s;
+  const prog = pomoState.seconds / pomoState.totalSecs;
+  document.getElementById('pomoRing').style.strokeDashoffset = CIRC * (1 - prog);
+  document.getElementById('pomoModeLabel').textContent =
+    pomoState.mode === 'focus' ? '🍅 集中タイム' : '☕ 休憩タイム';
+  document.getElementById('pomoSubLabel').textContent =
+    pomoState.mode === 'focus' ? 'focus' : 'break';
+  document.getElementById('pomoCount').innerHTML = '完了セット数: <strong>' + pomoState.sets + '</strong>';
+}
+
+function pomoStart() {
+  if (pomoState.running) return;
+  pomoState.running = true;
+  pomoState.interval = setInterval(() => {
+    if (pomoState.seconds <= 0) {
+      clearInterval(pomoState.interval);
+      pomoState.running = false;
+      if (pomoState.mode === 'focus') {
+        pomoState.sets++;
+        showToast('🎉 集中タイム終了！お疲れ様！');
+      } else {
+        showToast('⏰ 休憩終了！集中しよう！');
+      }
+      pomoUpdateUI();
+    } else {
+      pomoState.seconds--;
+      pomoUpdateUI();
+    }
+  }, 1000);
+}
+
+function pomoPause() {
+  clearInterval(pomoState.interval);
+  pomoState.running = false;
+}
+
+function pomoReset() {
+  clearInterval(pomoState.interval);
+  pomoState.running = false;
+  pomoState.seconds = 25 * 60;
+  pomoState.totalSecs = 25 * 60;
+  pomoState.mode = 'focus';
+  pomoUpdateUI();
+}
+
+function pomoBreak() {
+  clearInterval(pomoState.interval);
+  pomoState.running = false;
+  pomoState.mode = 'break';
+  pomoState.seconds = 5 * 60;
+  pomoState.totalSecs = 5 * 60;
+  pomoUpdateUI();
+  pomoStart();
+}
+
+pomoUpdateUI();
 </script>
 </body>
 </html>
